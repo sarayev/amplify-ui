@@ -22,7 +22,6 @@ Object.defineProperty(globalThis, 'crypto', {
 const fileOne = new File([], 'file-one');
 const fileTwo = new File([], 'file-two');
 const fileThree = new File([], 'file-three');
-
 const invalidFileOne = {
   ...new File([], 'invalid-file-one'),
   size: UPLOAD_FILE_SIZE_LIMIT + 1,
@@ -65,6 +64,27 @@ describe('resolveFiles', () => {
     const expected = {
       validFiles: [fileOne],
       invalidFiles: [invalidFileOne],
+    };
+
+    expect(output).toStrictEqual(expected);
+  });
+
+  it('returns the expected value when a custom file validator function is provided', () => {
+    const validFile = { ...new File([], 'valid-file'), size: 5 * 1000 };
+    const invalidFile = {
+      ...new File([], 'invalid-file'),
+      size: UPLOAD_FILE_SIZE_LIMIT - 1,
+    };
+
+    const customFileValidator = jest.fn(
+      (file: File) => file.size <= 1000 * 1000
+    );
+
+    const output = resolveFiles([validFile, invalidFile], customFileValidator);
+
+    const expected = {
+      validFiles: [validFile],
+      invalidFiles: [invalidFile],
     };
 
     expect(output).toStrictEqual(expected);

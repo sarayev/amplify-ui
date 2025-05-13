@@ -1,5 +1,6 @@
 import * as UIReactModule from '@aws-amplify/ui-react/internal';
 import { act, renderHook } from '@testing-library/react';
+import React from 'react';
 
 import { DEFAULT_STATE } from '../constants';
 import * as filesReducerModule from '../filesReducer';
@@ -77,7 +78,11 @@ describe('useFileItems', () => {
     });
 
     const { result } = renderHook(() => useFileItems(), {
-      wrapper: FileItemsProvider,
+      wrapper: ({ children }) => (
+        <FileItemsProvider validateFile={utilsModule.defaultFileSizeValidator}>
+          {children}
+        </FileItemsProvider>
+      ),
     });
 
     const [initState, handler] = result.current;
