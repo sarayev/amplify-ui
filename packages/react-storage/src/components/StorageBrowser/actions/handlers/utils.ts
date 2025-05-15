@@ -1,7 +1,10 @@
 import type { TransferProgressEvent } from 'aws-amplify/storage';
 import type { LocationAccess as AccessGrantLocation } from '../../storage-internal';
 
-import { MULTIPART_UPLOAD_THRESHOLD_BYTES } from './constants';
+import {
+  MAX_UPLOAD_OBJECT_SIZE,
+  MULTIPART_UPLOAD_THRESHOLD_BYTES,
+} from './constants';
 import type {
   ActionInputConfig,
   FileData,
@@ -161,3 +164,6 @@ export const getProgress = ({
 
 export const isMultipartUpload = (file: File): boolean =>
   file.size > MULTIPART_UPLOAD_THRESHOLD_BYTES;
+
+export const isValidObjectSize = (file: File): boolean =>
+  file.size <= MAX_UPLOAD_OBJECT_SIZE;

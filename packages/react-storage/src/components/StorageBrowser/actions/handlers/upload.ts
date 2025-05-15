@@ -12,8 +12,13 @@ import type {
   TaskHandlerOptions,
 } from './types';
 
-import { constructBucket, getProgress, isMultipartUpload } from './utils';
 import { DEFAULT_CHECKSUM_ALGORITHM } from './constants';
+import {
+  constructBucket,
+  getProgress,
+  isMultipartUpload,
+  isValidObjectSize,
+} from './utils';
 
 export interface UploadHandlerOptions extends TaskHandlerOptions {}
 
@@ -41,6 +46,15 @@ export const uploadHandler: UploadHandler = ({ config, data, options }) => {
   const { accountId, credentials, customEndpoint } = config;
   const { key, file, preventOverwrite } = data;
   const { onProgress } = options ?? {};
+
+  if (!isValidObjectSize(file)) {
+    const error = new Error('Object size cannot be greater than 5TB.');
+    const { message } = error;
+    return {
+      UNDEFINED_CALLBACKS,
+      result: Promise.resolve({ error, message, status: 'FAILED' }),
+    };
+  }
 
   const input: UploadDataInput = {
     path: key,
